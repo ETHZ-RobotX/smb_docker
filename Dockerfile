@@ -1,5 +1,4 @@
 # syntax=docker/dockerfile:1.0.0-experimental
-
 FROM ros:melodic
 
 # Preliminary dependencies
@@ -37,7 +36,6 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/*
 ENV PATH="/usr/lib/ccache:${PATH}"
 
-
 # Create and setup Catkin workspace
 RUN mkdir -p home/catkin_ws/src && \
     cd home/catkin_ws && \
@@ -70,5 +68,7 @@ RUN echo "source /home/catkin_ws/devel/setup.bash" >> ~/.bashrc
 RUN mkdir ~/.gazebo && mkdir ~/.gazebo/models && \
     cd ~/.gazebo && git clone https://github.com/osrf/gazebo_models.git && \
     mv gazebo_models/* models/ && rm -r gazebo_models
+
+WORKDIR /home/catkin_ws
 ENTRYPOINT [ "/ros_entrypoint.sh" ]
 CMD ["bash"]
