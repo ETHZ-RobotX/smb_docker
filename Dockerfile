@@ -61,8 +61,10 @@ RUN --mount=type=ssh cd home/catkin_ws/src/ && \
 
 # Build and source
 RUN cd home/catkin_ws/ && \
-    catkin build smb_sim smb_path_planner && \
-    /bin/bash -c "source devel/setup.bash"
+    catkin build smb_sim smb_path_planner \
+    elevation_mapping elevation_mapping_demos \
+    smb_confusor
+RUN echo "source /home/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
 WORKDIR /home
 ENTRYPOINT [ "/ros_entrypoint.sh" ]
