@@ -4,10 +4,12 @@ FROM ros:melodic
 
 # Preliminary dependencies
 RUN apt update && \
-    apt install -y git python-catkin-tools doxygen vim x11vnc xvfb \
+    apt install -y git wget python-catkin-tools doxygen vim x11vnc xvfb \
     ros-melodic-octomap ros-melodic-octomap-msgs \
     ros-melodic-octomap-ros ros-melodic-rosserial ros-melodic-joy \
-    ros-melodic-ompl ros-melodic-costmap-2d ros-melodic-velodyne-gazebo-plugins \
+    ros-melodic-ompl ros-melodic-costmap-2d \
+    ros-melodic-gazebo-plugins ros-melodic-velodyne-gazebo-plugins \
+    ros-melodic-hector-gazebo-plugins \
     libpcap0.8-dev libeigen3-dev libopencv-dev libboost-dev ros-melodic-cmake-modules libssh2-1-dev \
     libglpk-dev python-wstool net-tools \
     liblapack-dev libblas-dev autotools-dev dh-autoreconf \
@@ -19,11 +21,13 @@ RUN apt update && \
     ntpdate sysstat libv4l-0 ros-melodic-gps-common \
     ros-melodic-rqt-gui-cpp ros-melodic-rviz ros-melodic-rqt-gui \
     ros-melodic-cv-bridge ros-melodic-filters qttools5-dev ros-melodic-pcl-ros \
-    ros-melodic-tf-conversions ros-melodic-gazebo-plugins ros-melodic-xacro \
-    ros-melodic-robot-state-publisher ros-melodic-hector-gazebo-plugins \
+    ros-melodic-tf-conversions ros-melodic-xacro \
+    ros-melodic-robot-state-publisher \
     ros-melodic-nav-core ros-melodic-navfn ros-melodic-move-base \
     ros-melodic-teb-local-planner ros-melodic-pointcloud-to-laserscan \
-    ros-melodic-robot-self-filter libceres-dev && \
+    ros-melodic-robot-self-filter ros-melodic-dwa-local-planner \
+    ros-melodic-velodyne-description ros-melodic-grid-map-visualization \
+    libceres-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # (OPTIONAL) Install ccache for faster rebuilds
