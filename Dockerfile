@@ -66,6 +66,9 @@ RUN cd home/catkin_ws/ && \
     smb_confusor
 RUN echo "source /home/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
-WORKDIR /home
+# Quick fix for Gazebo (black screen issue - not finding models)
+RUN mkdir ~/.gazebo && mkdir ~/.gazebo/models && \
+    cd ~/.gazebo && git clone https://github.com/osrf/gazebo_models.git && \
+    mv gazebo_models/* models/ && rm -r gazebo_models
 ENTRYPOINT [ "/ros_entrypoint.sh" ]
 CMD ["bash"]
