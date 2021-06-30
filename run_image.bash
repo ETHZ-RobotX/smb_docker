@@ -17,6 +17,8 @@ echo "If you see Nvidia-Smi screen, it is succeed"
 
 sleep 5
 
+# Create bounding mount
+mkdir catkin_ws
 
 # If not working, first do: sudo rm -rf /tmp/.docker.xauth
 # It still not working, try running the script as root.
@@ -51,9 +53,11 @@ docker run -it \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     --env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
+    --volume=$(pwd)/catkin_ws:/home/catkin_ws \
     --net=host \
     --privileged \
     --runtime=nvidia \
+    --name smb_container \
     smb_docker \
     bash
 
