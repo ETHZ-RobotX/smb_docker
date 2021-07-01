@@ -3,7 +3,9 @@
 
 Documentation of the SuperMegaBot (SMB) Docker for the ETHZ Robotic Summer School.
 
->The docker image was tested on an Ubuntu PC with a Nvidia GPU. On other systems, the docker might not work as it is intended. In addition, the Docker image was written for only simulation purposes. In order to use the real robot, other settings for the image might be needed. 
+> The docker image was tested on an Ubuntu PC with a Nvidia GPU. On other systems, the docker might not work as it is intended. In addition, the Docker image was written for only simulation purposes. In order to use the real robot, other settings for the image might be needed. 
+
+> To use the SMB Docker, basic knowledge of Docker is needed. Please check [the official website](https://docs.docker.com) to learn how to build, save, reconnect etc. 
 
 {: .smb-mention }
 
@@ -25,14 +27,26 @@ cd <to_the_directory>
 sudo docker build -t smb_docker .
 ```
 
+> Note that, by running the next command, you will delete the docker container shared directory, if you have already a docker container shared directory in the directory (that you will run the next command).
+
 4. Run the bash file to activate container
 ```bash
 # Activate Container
 sudo ./run_image.bash
 ```
 
+
 5. When the Docker terminal showed up, follow the [installation guide of SMB](https://ethz-robotx.github.io/SuperMegaBot/core-software/installation_core.html)
 
+# Reconnecting the Docker Container
+
+```bash
+# Start the Docker Container
+sudo docker container start smb_container
+
+# Attach the Docker Container
+sudo docker container attach smb_container
+```
 
 # How to use simulation the Docker
 
