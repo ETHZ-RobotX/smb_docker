@@ -20,7 +20,6 @@ RUN mkdir -p home/catkin_ws/src && \
     cd src && \
     vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb.repos && \
     vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb_hw.repos && \
-    rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y && \
-    rm -rf *
+    rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y 
     
 WORKDIR /home/catkin_ws
