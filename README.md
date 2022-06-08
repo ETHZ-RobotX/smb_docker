@@ -3,8 +3,6 @@
 
 Documentation of the SuperMegaBot (SMB) Docker for the ETHZ Robotic Summer School.
 
-> The docker image was tested on an Ubuntu PC with a Nvidia GPU. On other systems, the docker might not work as it is intended. In addition, the Docker image was written for only simulation purposes. In order to use the real robot, other settings for the image might be needed. 
-
 > To use the SMB Docker, basic knowledge of Docker is needed. Please check [the official website](https://docs.docker.com) to learn how to build, save, reconnect etc. 
 
 {: .smb-mention }
@@ -15,28 +13,28 @@ Documentation of the SuperMegaBot (SMB) Docker for the ETHZ Robotic Summer Schoo
 
 
 # Setting up the Docker
+
+## Linux
 1. Install the Docker by using [the official website](https://docs.docker.com/engine/install/ubuntu/)
 2. Clone the repo into a directory in your host computer
-3. Build the image
-
+3. Run the bash file to create the container
 ```bash
 # Go the directory that you download the repo
-cd <to_the_directory>
+cd <path/to/repo>
 
-# Build the Image
-sudo docker build -t smb_docker .
-```
-
-> Note that, by running the next command, you will delete the docker container shared directory, if you have already a docker container shared directory in the directory (that you will run the next command).
-
-4. Run the bash file to activate container
-```bash
 # Activate Container
-sudo ./run_image.bash
+create_container.bash
 ```
+4. Clone the repositories by running `bash ../clone_repo.bash`
+5. To exit the container type `exit` in the terminal
 
+## Windows & MacOS
 
-5. When the Docker terminal showed up, follow the [installation guide of SMB](https://ethz-robotx.github.io/SuperMegaBot/core-software/installation_core.html)
+# Setup Visual Studio Code
+
+1. Open Visual Studio Code and install the **Remote - Containers** extension.
+2. Click on the extension on the sidebar and connect to the previously created container.
+3. When the new window opens install the **C/C++** and **Python** extension from Microsoft inside the container. This is needed in order to get autocompletion.
 
 # Reconnecting the Docker Container
 
@@ -55,14 +53,6 @@ If you want to launch several sessions connected to the same container from mult
 ```bash
 # Launch new session to the same container
 docker exec -it smb_container bash
-```
-
-You can change the files inside catkin_ws in docker from the host pc. You should run the following terminal command every time you created a new file inside the catkin_ws in docker. You can access the files inside the catkin_ws in the docker from the *catkin_ws* directory inside the directory in that you run the bash file (Setting up the docker, step 4 ). 
-
-```bash
-# Give access right to the files from the host.
-# Run it in the docker terminal 
-chmod -R a+rwx /home/catkin_ws
 ```
 
 If you want to run the simulation you can follow the [how to run SMB software](https://ethz-robotx.github.io/SuperMegaBot/core-software/HowToRunSoftware.html).

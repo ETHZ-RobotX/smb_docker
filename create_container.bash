@@ -1,24 +1,4 @@
-# Nvidia-docker install 
-# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#setting-up-nvidia-container-toolkit
-
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
-   && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
-   && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-   
-apt-get update   
-
-apt-get install -y nvidia-docker2
-
-systemctl restart docker
-
-sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
-
-echo "If you see Nvidia-Smi screen, it is succeed"
-
-sleep 5
-
-# Create bounding mount
-mkdir catkin_ws
+#!/bin/bash
 
 # If not working, first do: sudo rm -rf /tmp/.docker.xauth
 # It still not working, try running the script as root.
@@ -53,10 +33,8 @@ docker run -it \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     --env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
-    --volume=$(pwd)/catkin_ws:/home/catkin_ws \
+    --volume=smb_volume:/home/catkin_ws/src \
     --net=host \
-    --privileged \
-    --runtime=nvidia \
     --name smb_container \
     smb_docker \
     bash
