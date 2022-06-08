@@ -18,8 +18,8 @@ RUN mkdir -p /home/catkin_ws/src && \
     catkin init && \
     catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
     cd src && \
-    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/smb_dev/devel/smb.repos?token=GHSAT0AAAAAABTHRET75CKNAIMXPFOHWJM6YVASIBQ && \
-    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/smb_dev/devel/smb_hw.repos?token=GHSAT0AAAAAABTHRET6NRHRZIXI7RDHIVWWYVASINQ && \
+    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb.repos && \
+    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb_hw.repos && \
     rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y && \
     catkin build smb_gazebo smb_path_planner smb_slam
 
