@@ -36,7 +36,7 @@ docker run -it \
     --volume=smb_volume:/home/catkin_ws/src \
     --net=host \
     --name smb_container \
-    smb_docker \
+    ethzrobotx/smb_docker \
     bash
 
 echo "Done."
