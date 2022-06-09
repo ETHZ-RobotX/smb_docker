@@ -25,11 +25,21 @@ cd <path/to/repo>
 # Activate Container
 create_container.bash
 ```
-4. Clone the repositories by running `bash ../clone_repo.bash`
 5. To exit the container type `exit` in the terminal
 
-## Windows & MacOS
+## Windows
+1. Install Docker Desktop by using [the official website](https://docs.docker.com/desktop/windows/install/)
+2. Install VcXsrv [here](https://sourceforge.net/projects/vcxsrv/)
+3. Launch VcXsrv and leave the default options
+4. Open the powershell and run
+   ```bash
+   # Get your ip address
+   ipconfig
 
+   # Run docker
+   docker run -it --env="DISPLAY=<YOUR_IP_ADDR>:0.0" --volume=smb_volume:/home/catkin_ws/src --net=host --name smb_container ethzrobotx/smb_docker bash
+   ```
+5. To exit the container type `exit` in the terminal
 # Setup Visual Studio Code
 
 1. Open Visual Studio Code and install the **Remote - Containers** extension.
