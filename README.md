@@ -43,6 +43,18 @@ create_container.bash
    docker run -it --env="DISPLAY=<YOUR_IP_ADDR>:0.0" --volume=smb_volume:/home/catkin_ws/src --net=host --name smb_container ethzrobotx/smb_docker bash
    ```
 5. To exit the container type `exit` in the terminal
+
+## MacOS
+1. Install docker `brew cask install docker`
+2. Install XQuartz `brew cask install xquart`
+3. Open XQuartz using `open -a XQuartz` and in the **Security** tab check **Allow connections from network clients**
+4. Set IP with `IP=<YOUR_IP_ADDR>` and execute `xhost + $IP`
+5. To start the container
+   ```bash
+   # Run docker
+   docker run -it --env="DISPLAY=<YOUR_IP_ADDR>:0.0" --volume=/tmp/.X11-unix:/tmp/.X11-unix --volume=smb_volume:/home/catkin_ws/src --net=host --name smb_container ethzrobotx/smb_docker bash
+   ```
+6. To exit the container type `exit` in the terminal
 # Setup Visual Studio Code
 
 1. Open Visual Studio Code and install the **Remote - Containers** extension.
