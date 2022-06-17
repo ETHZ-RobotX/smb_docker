@@ -1,74 +1,28 @@
-# syntax=docker/dockerfile:1.0.0-experimental
-FROM ros:melodic
+FROM osrf/ros:noetic-desktop-full
 
-# Preliminary dependencies
-RUN apt update && \
-    apt install -y git wget python-catkin-tools doxygen vim x11vnc xvfb \
-    ros-melodic-octomap ros-melodic-octomap-msgs \
-    ros-melodic-octomap-ros ros-melodic-rosserial ros-melodic-joy \
-    ros-melodic-ompl ros-melodic-costmap-2d \
-    ros-melodic-gazebo-plugins ros-melodic-velodyne-gazebo-plugins \
-    ros-melodic-hector-gazebo-plugins \
-    libpcap0.8-dev libeigen3-dev libopencv-dev libboost-dev ros-melodic-cmake-modules libssh2-1-dev \
-    libglpk-dev python-wstool net-tools \
-    liblapack-dev libblas-dev autotools-dev dh-autoreconf \
-    libboost-all-dev python-setuptools cppcheck default-jre libgtest-dev \
-    libglew-dev clang-format-3.9 python-git pylint python-termcolor \
-    "ros-melodic-camera-info-manager*" protobuf-compiler protobuf-c-compiler \
-    libssh2-1-dev libatlas3-base libnlopt-dev \
-    "ros-melodic-tf2-*" python-pip python-autopep8 libreadline-dev ifstat \
-    ntpdate sysstat libv4l-0 ros-melodic-gps-common \
-    ros-melodic-rqt-gui-cpp ros-melodic-rviz ros-melodic-rqt-gui \
-    ros-melodic-cv-bridge ros-melodic-filters qttools5-dev ros-melodic-pcl-ros \
-    ros-melodic-tf-conversions ros-melodic-xacro \
-    ros-melodic-robot-state-publisher \
-    ros-melodic-nav-core ros-melodic-navfn ros-melodic-move-base \
-    ros-melodic-teb-local-planner ros-melodic-pointcloud-to-laserscan \
-    ros-melodic-robot-self-filter ros-melodic-dwa-local-planner \
-    ros-melodic-velodyne-description ros-melodic-grid-map-visualization \
-    libceres-dev && \
-    rm -rf /var/lib/apt/lists/*
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+    
+    
+RUN apt update
+RUN apt install -y python3-catkin-tools python3-pip python3-vcstool git software-properties-common wget vim nano
 
-# (OPTIONAL) Install ccache for faster rebuilds
-RUN apt update && \
-    apt install -y ccache && \
-    ccache --max-size=10G && \
-    rm -rf /var/lib/apt/lists/*
-ENV PATH="/usr/lib/ccache:${PATH}"
+RUN rosdep update
 
-# Create and setup Catkin workspace
-RUN mkdir -p home/catkin_ws/src && \
+
+RUN mkdir -p /home/catkin_ws/src && \
     cd home/catkin_ws && \
     catkin init && \
-    catkin config --extend /opt/ros/melodic && \
-    catkin config --merge-devel && \
-    catkin config -DCMAKE_BUILD_TYPE=Release
+    catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
+    cd src && \
+    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb.repos && \
+    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb_hw.repos && \
+    rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y && \
+    catkin build smb_gazebo smb_path_planner smb_slam
 
-# Allow SSH forwarding
-RUN apt update && apt install -y openssh-client && \
-    mkdir -p -m 0600 ~/.ssh && \
-    ssh-keyscan github.com >> ~/.ssh/known_hosts && \
-    ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
-
-# Install repos
-RUN --mount=type=ssh cd home/catkin_ws/src/ && \
-    git clone git@github.com:ETHZ-RobotX/SMB_dev.git && \
-    wstool init && \
-    wstool merge SMB_dev/smb2_0.rosinstall && \
-    wstool up -j8
-
-# Build and source
-RUN cd home/catkin_ws/ && \
-    catkin build smb_sim smb_path_planner \
-    elevation_mapping elevation_mapping_demos \
-    smb_confusor
-RUN echo "source /home/catkin_ws/devel/setup.bash" >> ~/.bashrc
-
-# Quick fix for Gazebo (black screen issue - not finding models)
-RUN mkdir ~/.gazebo && mkdir ~/.gazebo/models && \
-    cd ~/.gazebo && git clone https://github.com/osrf/gazebo_models.git && \
-    mv gazebo_models/* models/ && rm -r gazebo_models
-
-WORKDIR /home/catkin_ws
-ENTRYPOINT [ "/ros_entrypoint.sh" ]
-CMD ["bash"]
+RUN mkdir /home/catkin_ws/src/.vscode   
+ADD ./.vscode/* /home/catkin_ws/src/.vscode
+WORKDIR /home/catkin_ws/src
