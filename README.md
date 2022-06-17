@@ -21,13 +21,12 @@ create_container.bash
 
 
 ### Windows
-
 1. Install Docker Desktop by using [the official website](https://docs.docker.com/desktop/windows/install/)
 2. Install VcXsrv [here](https://sourceforge.net/projects/vcxsrv/)
 3. Launch VcXsrv and put the settings as in the pictures
-   ![setup 1](../images/docker_setup_1.png)
-   ![setup 2](../images/docker_setup_2.png)
-   ![setup 3](../images/docker_setup_3.png)
+   ![setup 1](images/docker_setup_1.png)
+   ![setup 2](images/docker_setup_2.png)
+   ![setup 3](images/docker_setup_3.png)
 4. Open the powershell and run
 
 ```bash
