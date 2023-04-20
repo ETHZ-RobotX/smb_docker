@@ -27,6 +27,8 @@ ls -FAlh $XAUTH
 echo ""
 echo "Running docker..."
 
+#    --device="/dev/fb0:/dev/fb0"\
+#    --user="$(id --user):$(id --group)" \
 docker run -it \
     --env="DISPLAY=$DISPLAY" \
     --env="QT_X11_NO_MITSHM=1" \
@@ -34,9 +36,9 @@ docker run -it \
     --env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
     --volume=smb_volume:/home/catkin_ws/src \
+    --volume="/dev/dri:/dev/dri" \
     --net=host \
     --name smb_container \
     ethzrobotx/smb_docker \
-    bash
 
 echo "Done."
