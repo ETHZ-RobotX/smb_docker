@@ -40,5 +40,6 @@ docker run -it \
     --net=host \
     --name smb_container \
     ethzrobotx/smb_docker \
+    bash
 
 echo "Done."
