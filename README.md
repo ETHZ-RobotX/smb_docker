@@ -45,8 +45,8 @@ docker run -it --env="DISPLAY=<YOUR_IP_ADDR>:0.0" --volume=smb_volume:/home/catk
 > Usage of Visual Studio is not necessary.
 
 
-1. Open Visual Studio Code and install the **Remote - Containers** extension.
-2. Click on the extension on the sidebar and connect to the previously created container.
+1. Open Visual Studio Code and install the **Dev Containers** extension.
+2. Click on the extension on the bottom left corner and connect to the previously created container.
 3. When the new window opens install the **C/C++** and **Python** extension from Microsoft inside the container. This is needed in order to get autocompletion.
 
 ## Reconnecting to the Docker container
