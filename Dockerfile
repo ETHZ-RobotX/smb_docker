@@ -8,7 +8,11 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
     
     
 RUN apt update
-RUN apt install -y python3-catkin-tools python3-pip python3-vcstool git software-properties-common wget vim nano
+RUN apt install -y python3-catkin-tools python3-pip python3-vcstool git software-properties-common wget vim nano 
+
+RUN add-apt-repository -y ppa:roehling/open3d  && \
+    apt install -y libopen3d-dev
+
 
 RUN rosdep update
 
