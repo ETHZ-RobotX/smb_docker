@@ -29,4 +29,5 @@ RUN mkdir -p /home/catkin_ws/src && \
 
 RUN mkdir /home/catkin_ws/src/.vscode   
 ADD ./.vscode/* /home/catkin_ws/src/.vscode
+RUN echo "source /home/catkin_ws/devel/setup.bash" >> /root/.bashrc
 WORKDIR /home/catkin_ws/src

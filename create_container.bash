@@ -27,7 +27,7 @@ ls -FAlh $XAUTH
 echo ""
 echo "Running docker..."
 
-docker run -it \
+docker run -d -it\
     --env="DISPLAY=$DISPLAY" \
     --env="QT_X11_NO_MITSHM=1" \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
