@@ -34,6 +34,7 @@ docker run -d -it\
     --env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
     --volume=smb_volume:/home/catkin_ws/src \
+    --volume="/dev/dri:/dev/dri" \
     --net=host \
     --name smb_container \
     ethzrobotx/smb_docker \
