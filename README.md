@@ -14,10 +14,10 @@
 cd <path/to/repo>
 
 # Activate Container
-create_container.bash
+./create_container.bash
 ```
 
-4. To exit the container type `exit` in the terminal
+This will automatically setup your system to later run the docker and download the pre-compiled image from dockerhub. Once downloaded, the script starts a container called `smb_container` that can be used to run the SMB software (see [reconnecting to the docker container](#reconnecting-to-the-docker-container)).
 
 
 ### Windows
@@ -25,16 +25,16 @@ create_container.bash
 2. Install VcXsrv [here](https://sourceforge.net/projects/vcxsrv/)
 3. Launch VcXsrv and put the settings as in the pictures
    ![setup 1](images/docker_setup_1.png)
+
    ![setup 2](images/docker_setup_2.png)
+
    ![setup 3](images/docker_setup_3.png)
+
 4. Open the powershell and run
 
 ```bash
-# Get your ip address
-ipconfig
-
 # Run docker
-docker run -it --env="DISPLAY=<YOUR_IP_ADDR>:0.0" --volume=smb_volume:/home/catkin_ws/src --net=host --name smb_container ethzrobotx/smb_docker bash
+docker run -it --env="DISPLAY=host.docker.internal:0.0" --volume=smb_volume:/home/catkin_ws/src --net=host --name smb_container ethzrobotx/smb_docker bash
 ```
 
 5. To exit the container type `exit` in the terminal
@@ -45,29 +45,44 @@ docker run -it --env="DISPLAY=<YOUR_IP_ADDR>:0.0" --volume=smb_volume:/home/catk
 > Usage of Visual Studio is not necessary.
 
 
-1. Open Visual Studio Code and install the **dev-containers** extension.
-2. Click on the extension on the left bottom corner and connect to the previously created container.
+1. Open Visual Studio Code and install the **dev - containers** extension.
+2. Click on the extension on the bottom left corner and attach to the previously created container.
 3. When the new window opens install the **C/C++** and **Python** extension from Microsoft inside the container. This is needed in order to get autocompletion.
+4. The catkin workspace is located in /home/catkin_ws
 
-## Reconnecting to the Docker container
+## (Re-)connecting to the Docker container
 
-```bash
-# Start the Docker Container
-sudo docker container start smb_container
-
-# Attach the Docker Container
-sudo docker container attach smb_container
-```
-
-## How to use simulation the Docker
-
-If you want to launch several sessions connected to the same container from multiple terminals: 
+Once you have setup the smb_container, you can create a terminal (bash shell) by running
 
 ```bash
-# Launch new session to the same container
 docker exec -it smb_container bash
 ```
 
-If you want to run the simulation you can follow the [how to run SMB software](https://ethz-robotx.github.io/SuperMegaBot/core-software/HowToRunSoftware.html).
+There is no need to run the script create_container.sh anymore. 
 
-> You can run launch_gazebo_gui:=false if you do not need to see the simulation environment. Yet, you can recognize the obstacles in the Rviz visualization tool thanks to the modeled sensor behavior.
+If you closed all running instances of bash in the `smb_container`, you might need to start it again by running
+
+```bash
+# start docker container
+docker start smb_container
+
+# create a terminal (bash) in the container:
+docker exec -it smb_container bash
+```
+
+The latter command can be repeated multiple times to create several terminals in the same container.
+
+## How to use the simulation in the Docker container
+
+If you want to run the simulation you can follow the [how to run SMB software](https://ethz-robotx.github.io/SuperMegaBot/core-software/HowToRunSoftware.html) and run the commands given there in a terminal in the smb_container. I.e.
+
+```bash
+# create a terminal (bash) in the container:
+docker exec -it smb_container bash
+```
+
+In the then so created terminal, run:
+
+```bash
+roslaunch smb_gazebo sim.launch
+```
