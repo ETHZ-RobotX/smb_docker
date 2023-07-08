@@ -25,16 +25,16 @@ RUN mkdir -p /home/catkin_ws/src && \
     rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y
 
 RUN cd /home/catkin_ws/ && \
-    catkin build smb_gazebo smb_path_planner smb_slam
+    catkin build --no-status smb_gazebo smb_path_planner smb_slam
 
 RUN cd /home/catkin_ws/ && \
-    catkin build smb_msf_graph
+    catkin build --no-status smb_msf_graph
 
 RUN cd /home/catkin_ws/src/object_detection && \
     git fetch && \
     git checkout docker && \
     python3 -m pip install -r requirements.txt && \
-    catkin build object_detection
+    catkin build --no-status object_detection
 
 RUN sudo mkdir -p /usr/share/yolo/models && \
     cd /usr/share/yolo/models && \
