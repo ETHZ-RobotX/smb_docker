@@ -8,14 +8,12 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
     
     
 RUN apt update
-RUN apt install -y python3-catkin-tools python3-pip python3-vcstool git software-properties-common wget vim nano 
+RUN apt install -y python3-catkin-tools python3-pip python3-vcstool git software-properties-common wget vim nano
 
 RUN add-apt-repository -y ppa:roehling/open3d  && \
-    apt install -y libopen3d-dev
-
+    apt install -y libopen3d-dev cmake
 
 RUN rosdep update
-
 
 RUN mkdir -p /home/catkin_ws/src && \
     cd home/catkin_ws && \
@@ -24,8 +22,23 @@ RUN mkdir -p /home/catkin_ws/src && \
     cd src && \
     vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb.repos && \
     vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb_hw.repos && \
-    rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y && \
+    rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y
+
+RUN cd /home/catkin_ws/ && \
     catkin build smb_gazebo smb_path_planner smb_slam
+
+RUN cd /home/catkin_ws/ && \
+    catkin build smb_msf_graph
+
+RUN cd /home/catkin_ws/src/object_detection && \
+    git fetch && \
+    git checkout docker && \
+    python3 -m pip install -r requirements.txt && \
+    catkin build object_detection
+
+RUN sudo mkdir -p /usr/share/yolo/models && \
+    cd /usr/share/yolo/models && \
+    wget https://github.com/ultralytics/yolov5/releases/download/v6.1/yolov5s6.pt https://github.com/ultralytics/yolov5/releases/download/v6.1/yolov5m6.pt
 
 RUN mkdir /home/catkin_ws/src/.vscode   
 ADD ./.vscode/* /home/catkin_ws/src/.vscode
