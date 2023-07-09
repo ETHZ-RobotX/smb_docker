@@ -31,4 +31,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ethzrobotx/smb_docker:latest
+          tags: ethzrobotx/smb_docker:cv_notebook_light

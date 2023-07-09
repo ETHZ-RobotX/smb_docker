@@ -1,28 +1,25 @@
-FROM osrf/ros:noetic-desktop-full
+ARG UBUNTU_VER=20.04
+ARG CONDA_VER=latest
+ARG OS_TYPE=x86_64
+ARG PY_VER=3.8.11
+ARG TF_VER=2.5.0
 
-# nvidia-container-runtime
-ENV NVIDIA_VISIBLE_DEVICES \
-    ${NVIDIA_VISIBLE_DEVICES:-all}
-ENV NVIDIA_DRIVER_CAPABILITIES \
-    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
-    
-    
-RUN apt update
-RUN apt install -y python3-catkin-tools python3-pip python3-vcstool git software-properties-common wget vim nano
+FROM ubuntu:${UBUNTU_VER}
 
-RUN rosdep update
+# System packages 
+RUN apt-get update && apt-get install -yq curl wget jq vim pip
 
+ARG CONDA_VER
+ARG OS_TYPE
 
-RUN mkdir -p /home/catkin_ws/src && \
-    cd home/catkin_ws && \
-    catkin init && \
-    catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
-    cd src && \
-    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb.repos && \
-    vcs import --recursive --input https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master/smb_hw.repos && \
-    rosdep install --from-paths . --ignore-src --os=ubuntu:focal -r -y && \
-    catkin build smb_gazebo smb_path_planner smb_slam
+# Install miniconda to /miniconda
+RUN curl -LO "http://repo.continuum.io/miniconda/Miniconda3-${CONDA_VER}-Linux-${OS_TYPE}.sh"
+RUN bash Miniconda3-${CONDA_VER}-Linux-${OS_TYPE}.sh -p /miniconda -b
+RUN rm Miniconda3-${CONDA_VER}-Linux-${OS_TYPE}.sh
+ENV PATH=/miniconda/bin:${PATH}
+RUN conda update -y conda
 
-RUN mkdir /home/catkin_ws/src/.vscode   
-ADD ./.vscode/* /home/catkin_ws/src/.vscode
-WORKDIR /home/catkin_ws/src
+RUN mkdir -p /home/notebook
+COPY ./env_yolov8.yml /home/notebook/
+RUN conda env create -f /home/notebook/env_yolov8.yml
+RUN conda init 
