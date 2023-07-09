@@ -1,0 +1,1 @@
+docker build -t ethzrobotx:cv_notebook_light .
