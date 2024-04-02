@@ -1,12 +1,15 @@
 FROM osrf/ros:noetic-desktop-full
 
+LABEL org.opencontainers.image.source="https://github.com/ETHZ-RobotX/smb_docker"
+LABEL org.opencontainers.image.description="Development environment for the SuperMegaBot (SMB)"
+
 # nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
-    
-    
+
+
 RUN apt update
 RUN apt install -y python3-catkin-tools python3-pip python3-vcstool git software-properties-common wget vim nano
 
