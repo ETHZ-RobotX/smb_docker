@@ -1,0 +1,16 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+	"name": "SuperMegaBot Dev Container",
+	// "build": {
+	// 	"context": ".",
+	// 	"dockerfile": "Dockerfile"
+	// },
+	"image": "smb_test",
+	// "remoteEnv": {
+	// 	"DISPLAY": "${localEnv:DISPLAY}",
+	// },
+	// "runArgs": [
+	// 	"--volume=/tmp/.X11-unix/X0:/tmp/.X11-unix/X0",
+	// ]
+}

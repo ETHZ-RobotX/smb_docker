@@ -1,27 +1,39 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
-	"name": "SMB dev container",
+	"name": "SuperMegaBot Dev Container Base",
 	"build": {
-		// Sets the run context to one level up instead of the .devcontainer folder.
 		"context": ".",
-		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
-		"dockerfile": "Dockerfile"
+		"dockerfile": "Dockerfile",
+		"args": {
+			"SMB_RAW_REPO_URL": "https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/fix/remove_private_repos"
+		}
 	},
+	"runArgs": [
+		"--shm-size=1g"
+	],
+	"privileged": true,
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {},
-		"ghcr.io/devcontainers/features/desktop-lite:1": {},
-		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers/features/git-lfs:1": {}
-	}
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Uncomment the next line to run commands after the container is created.
-	// "postCreateCommand": "cat /etc/os-release",
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "devcontainer"
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"username": "robotx",
+			"userUid": "1000",
+			"userGid": "1000"
+		},
+		"ghcr.io/devcontainers/features/desktop-lite:1": {
+			"password": "robotx"
+		}
+	},
+	"forwardPorts": [
+		6080,
+		5901
+	],
+	"portsAttributes": {
+		"6080": {
+			"label": "VNC web client (noVNC)",
+			"onAutoForward": "silent"
+		},
+		"5901": {
+			"label": "VNC TCP port",
+			"onAutoForward": "silent"
+		}
+	},
+	"containerUser": "robotx"
 }
