@@ -46,5 +46,5 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
             subFolder: .github
-            imageName:  ${{steps.meta.outputs.tags}}
+            imageName:  ghcr.io/ethz-robotx/smb_docker
             push: always
