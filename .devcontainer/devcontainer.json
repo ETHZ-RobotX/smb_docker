@@ -2,14 +2,13 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
 	"name": "SuperMegaBot Dev Container",
-	// "build": {
-	// 	"context": ".",
-	// 	"dockerfile": "Dockerfile"
-	// },
-	"image": "smb_test",
-	// "remoteEnv": {
-	// 	"DISPLAY": "${localEnv:DISPLAY}",
-	// },
+	"build": {
+		"context": ".",
+		"dockerfile": "Dockerfile"
+	},
+	"runArgs": [
+		"--network=host"
+	]
 	// "runArgs": [
 	// 	"--volume=/tmp/.X11-unix/X0:/tmp/.X11-unix/X0",
 	// ]
