@@ -32,22 +32,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Extract Docker metadata
-      #   id: meta
-      #   uses: docker/metadata-action@v5
-      #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      #     tags: |
-      #       type=ref,event=branch
-      #       type=ref,event=pr
-      #       type=semver,pattern={{version}}
-      #       type=semver,pattern={{major}}.{{minor}}
-      #       type=semver,pattern={{major}}
-      #       type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
 
       - name: Pre-build dev container image
         uses: devcontainers/ci@v0.3
         with:
             subFolder: .github
-            imageName:  ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            imageName:  ${{steps.meta.outputs.tags}}
             push: always
