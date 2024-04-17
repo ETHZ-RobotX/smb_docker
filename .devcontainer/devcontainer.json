@@ -1,10 +1,12 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
 	"name": "SuperMegaBot Dev Container",
 	"build": {
 		"context": ".",
-		"dockerfile": "Dockerfile"
+		"dockerfile": "Dockerfile",
+		"args": {
+			"BASE_IMAGE": "ghcr.io/ethz-robotx/smb_docker",
+			"VNC_RESOLUTION": "1920x1080x32"
+		}
 	},
 	"runArgs": [
 		"--network=host"
