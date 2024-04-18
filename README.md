@@ -1,7 +1,31 @@
 # Using Docker for Simulation
-[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/ETHZ-RobotX/smb_docker/tree/feature/wip_devcontainer)
 
 > To use the SMB Docker, basic knowledge of Docker is needed. Please check [the official website](https://docs.docker.com) to learn how to build, save, reconnect etc.
+
+## Get started
+### TL;DR
+**Method 1**: [Open a GitHub repos in an isolated container volume](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-a-git-repository-or-github-pr-in-an-isolated-container-volume). You can do it by clicking [![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/ETHZ-RobotX/smb_docker/tree/feature/wip_devcontainer)
+
+**Method 2**: [Open an existing folder in a dev container](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+
+#### Clone repo & checkout branch & open in VScode
+
+```bash
+git clone git@github.com:ETHZ-RobotX/smb_docker.git smb_docker
+
+cd smb_docker
+
+git checkout feature/wip_devcontainer 
+
+code .
+```
+#### Reopen workspace in dev container
+
+Run the `Dev Containers: Reopen in Container` command from the Command Palette (`F1`) or quick actions Status bar item (the blue button at the bottom-left corner of VScode).
+
+![quick action bar](images/quick_action_icon.png)
+
+
 
 
 ## Setting up Docker
