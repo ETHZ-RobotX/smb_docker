@@ -65,18 +65,18 @@ RUN mkdir -p /usr/share/yolo/models && \
     cd /usr/share/yolo/models && \
     wget https://github.com/ultralytics/yolov5/releases/download/v6.1/yolov5s6.pt https://github.com/ultralytics/yolov5/releases/download/v6.1/yolov5m6.pt
 
-RUN python3 -m pip install -r src/object_detection/requirements.txt
+# RUN python3 -m pip install -r src/object_detection/requirements.txt
 
-# Build SMB packages
-COPY --from=cacher $OVERLAY_WS/src ./src
-RUN catkin init && \
-    catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
-    catkin build --no-status \
-    smb_gazebo \
-    smb_path_planner \
-    smb_slam
+# # Build SMB packages
+# COPY --from=cacher $OVERLAY_WS/src ./src
+# RUN catkin init && \
+#     catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
+#     catkin build --no-status \
+#     smb_gazebo \
+#     smb_path_planner \
+#     smb_slam
 
-RUN catkin build --no-status object_detection
+# RUN catkin build --no-status object_detection
 
-# RUN catkin build --no-status smb_msf_graph
+# # RUN catkin build --no-status smb_msf_graph
 
