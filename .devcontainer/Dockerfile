@@ -3,7 +3,11 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    x11-apps \
+    x11-utils \
+    mesa-utils
 
 ARG VNC_RESOLUTION
 ENV VNC_RESOLUTION=$VNC_RESOLUTION

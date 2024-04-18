@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
 
 ARG OVERLAY_WS=/opt/ros/overlay_ws
+ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master
 
 # multi-stage build for caching
 FROM osrf/ros:noetic-desktop-full AS cacher
 
 ARG OVERLAY_WS
-ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
     python3-vcstool \
@@ -67,16 +67,19 @@ RUN mkdir -p /usr/share/yolo/models && \
 
 # RUN python3 -m pip install -r src/object_detection/requirements.txt
 
-# # Build SMB packages
-# COPY --from=cacher $OVERLAY_WS/src ./src
-# RUN catkin init && \
-#     catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
-#     catkin build --no-status \
-#     smb_gazebo \
-#     smb_path_planner \
-#     smb_slam
+# Build SMB packages
+COPY --from=cacher $OVERLAY_WS/src ./src
+RUN catkin init && \
+    catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
+    catkin build --no-status \
+    smb_gazebo \
+    smb_path_planner \
+    smb_slam
 
 # RUN catkin build --no-status object_detection
 
 # # RUN catkin build --no-status smb_msf_graph
+
+ARG SMB_RAW_REPO_URL
+ENV SMB_RAW_REPO_URL=${SMB_RAW_REPO_URL}
 

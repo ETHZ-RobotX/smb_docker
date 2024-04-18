@@ -9,9 +9,40 @@
 		}
 	},
 	"runArgs": [
+		// Uncomment it if you have problems with the auto X11 forwarding
+		// "--volume=/tmp/.X11-unix/X0:/tmp/.X11-unix/X0", 
 		"--network=host"
-	]
-	// "runArgs": [
-	// 	"--volume=/tmp/.X11-unix/X0:/tmp/.X11-unix/X0",
-	// ]
+	],
+	"containerEnv": {
+		"SMB_RAW_REPO_URL": "https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/fix/remove_private_repos",
+		"DISPLAY": "${localEnv:DISPLAY}"
+	},
+	"postCreateCommand": "bash ./.devcontainer/post-create.sh",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"git.autoRepositoryDetection": true,
+				"git.repositoryScanMaxDepth": 5,
+				"git.ignoredRepositories": [
+					"src/lib/ocs2",
+					"src/lib/gtsam_catkin",
+					"src/misc/minkindr",
+					"src/misc/catkin_simplWe",
+					"src/misc/minkindr_ros",
+					"src/misc/eigen_checks",
+					"src/misc/glog_catkin",
+					"src/misc/gflags_catkin",
+					"src/misc/mav_comm",
+					"src/misc/eigen_catkin",
+					"src/misc/yaml_cpp_catkin"
+				]
+			},
+			"extensions": [
+				"ms-iot.vscode-ros",
+				"redhat.vscode-xml",
+				"ms-vscode.cpptools",
+				"ms-vscode.cpptools-themes"
+			]
+		}
+	}
 }
