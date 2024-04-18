@@ -46,5 +46,6 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
             subFolder: .github
-            imageName:  ghcr.io/ethz-robotx/smb_docker
+            imageName: ghcr.io/ethz-robotx/smb_docker
+            cacheFrom: ghcr.io/ethz-robotx/smb_docker
             push: always
