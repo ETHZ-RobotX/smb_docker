@@ -7,6 +7,7 @@ ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/
 FROM osrf/ros:noetic-desktop-full AS cacher
 
 ARG OVERLAY_WS
+ARG SMB_RAW_REPO_URL
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
     python3-vcstool \
