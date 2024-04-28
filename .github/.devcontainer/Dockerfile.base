@@ -1,0 +1,94 @@
+# syntax=docker/dockerfile:1
+
+ARG OVERLAY_WS=/opt/ros/overlay_ws
+ARG BASE_IMAGE=ros:noetic-perception-focal
+ARG OPEN3D_INSTALL_DIR=/tmp/open3d_install
+
+FROM $BASE_IMAGE AS base
+
+# install common dependencies shared by all images
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
+    python3-vcstool \
+    git \
+    wget \
+    curl \
+    vim \
+    nano 
+
+# cache dependency manifests for faster builds
+FROM base AS cacher
+
+ARG OVERLAY_WS
+ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/fix/remove_private_repos
+
+WORKDIR ${OVERLAY_WS}/src
+RUN vcs import --recursive --input ${SMB_RAW_REPO_URL}/smb.repos
+
+WORKDIR /opt
+RUN mkdir -p /tmp/opt && \
+    find ./ -name "package.xml" | \
+    xargs cp --parents -t /tmp/opt && \
+    find ./ -name "requirements.txt" | \
+    xargs cp --parents -t /tmp/opt || true && \
+    find ./ -name "CATKIN_IGNORE" | \
+    xargs cp --parents -t /tmp/opt || true
+
+FROM ubuntu:focal AS open3d-builder
+
+ARG REINSTALL_CMAKE_VERSION=3.29.2
+ARG OPEN3D_VERSION=0.15.1
+ARG OPEN3D_INSTALL_DIR
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    curl \
+    ca-certificates \
+    build-essential \
+    git
+
+COPY ./reinstall-cmake.sh /tmp/
+
+RUN chmod +x /tmp/reinstall-cmake.sh && \
+    DEBIAN_FRONTEND=noninteractive /tmp/reinstall-cmake.sh ${REINSTALL_CMAKE_VERSION}
+
+RUN wget -qO- https://github.com/isl-org/Open3D/archive/refs/tags/v${OPEN3D_VERSION}.tar.gz | tar xzv -C /tmp
+
+WORKDIR /tmp/Open3D-${OPEN3D_VERSION}
+
+RUN chmod +x util/install_deps_ubuntu.sh && \
+    DEBIAN_FRONTEND=noninteractive SUDO=command ./util/install_deps_ubuntu.sh assume-yes
+
+RUN mkdir build && cd build && \
+    cmake -DCMAKE_INSTALL_PREFIX=${OPEN3D_INSTALL_DIR} \
+    -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_PYTHON_MODULE=OFF \
+    -DBUILD_GUI=OFF \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DDEVELOPER_BUILD=OFF .. && \
+    make -j$(nproc) && make install
+
+FROM base AS default
+
+ARG DEBIAN_FRONTEND=noninteractive
+LABEL org.opencontainers.image.source="https://github.com/ETHZ-RobotX/smb_docker"
+LABEL org.opencontainers.image.description="Prebuild base image of the SuperMegaBot(SMB) image."
+
+# install ros packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-noetic-desktop-full=1.5.0-1*
+
+# install other dependencies
+RUN apt-get install -y --no-install-recommends \
+    python3-catkin-tools \
+    libfmt-dev 
+
+# Install SMB dependencies
+ARG OVERLAY_WS
+WORKDIR $OVERLAY_WS
+COPY --from=cacher /tmp/$OVERLAY_WS/src ./src
+RUN rosdep update && rosdep install --from-paths src --ignore-src --os=ubuntu:focal -r -y
+
+# Install Open3D
+ARG OPEN3D_INSTALL_DIR
+COPY --from=open3d-builder $OPEN3D_INSTALL_DIR /usr/local
