@@ -1,9 +1,10 @@
-		{
+{
 	"name": "SuperMegaBot Dev Container",
 	"build": {
 		"context": ".",
 		"dockerfile": "Dockerfile",
 		"args": {
+			"BUILDKIT_INLINE_CACHE": "0",
 			"BASE_IMAGE": "ghcr.io/ethz-robotx/smb_docker",
 			"VNC_RESOLUTION": "1920x1080x32"
 		}
@@ -11,12 +12,36 @@
 	"runArgs": [
 		// Uncomment it if you have problems with the auto X11 forwarding
 		// "--volume=/tmp/.X11-unix/X0:/tmp/.X11-unix/X0", 
+		"--shm-size=1g",
 		"--network=host"
 	],
+	"privileged": true,
 	"containerEnv": {
-		"SMB_RAW_REPO_URL": "https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/fix/remove_private_repos",
 		"DISPLAY": "${localEnv:DISPLAY}"
 	},
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"username": "robotx"
+		},
+		"ghcr.io/devcontainers/features/desktop-lite:1": {
+			"password": "robotx"
+		}
+	},
+	"forwardPorts": [
+		6080,
+		5901
+	],
+	"portsAttributes": {
+		"6080": {
+			"label": "VNC web client (noVNC)",
+			"onAutoForward": "silent"
+		},
+		"5901": {
+			"label": "VNC TCP port",
+			"onAutoForward": "silent"
+		}
+	},
+	"containerUser": "robotx",
 	"postCreateCommand": "bash ./.devcontainer/post-create.sh",
 	"customizations": {
 		"vscode": {
