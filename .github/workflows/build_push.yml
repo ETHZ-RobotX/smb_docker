@@ -1,4 +1,4 @@
-name: devcontainer-publish
+name: build-smb-base-image
 
 on:
   workflow_dispatch:
@@ -22,6 +22,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -42,10 +45,17 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
 
-      - name: Pre-build dev container image
-        uses: devcontainers/ci@v0.3
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
         with:
-            subFolder: .github
-            imageName: ghcr.io/ethz-robotx/smb_docker
-            cacheFrom: ghcr.io/ethz-robotx/smb_docker
-            push: always
+          context: ./.github/.devcontainer
+          file: ./.github/.devcontainer/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/ethz-robotx/smb_docker:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          no-cache-filters: cacher
+          provenance: false
