@@ -42,6 +42,7 @@
 		}
 	},
 	"containerUser": "robotx",
+	"initializeCommand": "docker pull ghcr.io/ethz-robotx/smb_docker:latest",
 	"postCreateCommand": "bash ./.devcontainer/post-create.sh",
 	"customizations": {
 		"vscode": {
