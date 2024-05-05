@@ -1,86 +1,56 @@
 # syntax=docker/dockerfile:1
 
-ARG OVERLAY_WS=/opt/ros/overlay_ws
-ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/master
+###########################################################################
+########### This is the devcontainer base image for SuperMegaBot(SMB)    ##
+########### It is built and pushed to Github Container Registry by CI    ##
+###########################################################################
 
-# multi-stage build for caching
-FROM osrf/ros:noetic-desktop-full AS cacher
+ARG SMB_REPO_BRANCH_NAME=docker
+ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/${SMB_REPO_BRANCH_NAME}
+
+ARG BASE_IMAGE=ghcr.io/ethz-robotx/smb_ros_base:latest
+ARG OVERLAY_WS=/smb_ws
+
+# Cache package.xml and python requirements.txt
+FROM $BASE_IMAGE AS cacher
 
 ARG OVERLAY_WS
-ARG SMB_RAW_REPO_URL
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
-    python3-vcstool \
-    git
+ARG SMB_REPO_BRANCH_NAME=docker
+ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/${SMB_REPO_BRANCH_NAME}
 
 WORKDIR ${OVERLAY_WS}/src
-RUN vcs import --recursive --input ${SMB_RAW_REPO_URL}/smb.repos && \
-    vcs import --recursive --input ${SMB_RAW_REPO_URL}/smb_hw.repos
+RUN vcs import --recursive --input ${SMB_RAW_REPO_URL}/smb.repos
 
-WORKDIR /opt
-RUN mkdir -p /tmp/opt && \
-    find ./ -name "package.xml" | \
-    xargs cp --parents -t /tmp/opt && \
-    find ./ -name "requirements.txt" | \
-    xargs cp --parents -t /tmp/opt || true && \
-    find ./ -name "CATKIN_IGNORE" | \
-    xargs cp --parents -t /tmp/opt || true
+WORKDIR /tmp
+RUN find ${OVERLAY_WS}/src -name "package.xml" | \
+    xargs cp --parents -t /tmp && \
+    find ${OVERLAY_WS}/src -name "requirements.txt" | \
+    xargs cp --parents -t /tmp || true && \
+    find ${OVERLAY_WS}/src -name "CATKIN_IGNORE" | \
+    xargs cp --parents -t /tmp || true
 
-FROM osrf/ros:noetic-desktop-full AS builder
+FROM $BASE_IMAGE AS default
 
 ARG DEBIAN_FRONTEND=noninteractive
 LABEL org.opencontainers.image.source="https://github.com/ETHZ-RobotX/smb_docker"
 LABEL org.opencontainers.image.description="Base development environment for the SuperMegaBot (SMB)"
 
-# nvidia-container-runtime
+# Nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    apt-utils \
-    software-properties-common 
-
-RUN add-apt-repository -y ppa:roehling/open3d && apt-get update
-
-RUN apt-get install -y --no-install-recommends \
-    python3-catkin-tools \
-    python3-pip \
-    python3-vcstool \
-    git \
-    wget \
-    vim \
-    nano \
-    libopen3d-dev
-
-RUN rosdep update
-
-# Install SMB dependencies
-ARG OVERLAY_WS
-WORKDIR $OVERLAY_WS
-COPY --from=cacher /tmp/$OVERLAY_WS/src ./src
-RUN rosdep install --from-paths src --ignore-src --os=ubuntu:focal -r -y
-
-RUN mkdir -p /usr/share/yolo/models && \
-    cd /usr/share/yolo/models && \
-    wget https://github.com/ultralytics/yolov5/releases/download/v6.1/yolov5s6.pt https://github.com/ultralytics/yolov5/releases/download/v6.1/yolov5m6.pt
-
-# RUN python3 -m pip install -r src/object_detection/requirements.txt
-
-# Build SMB packages
-COPY --from=cacher $OVERLAY_WS/src ./src
-RUN catkin init && \
-    catkin config --extend /opt/ros/noetic -DCMAKE_BUILD_TYPE=Release && \
-    catkin build --no-status \
-    smb_gazebo \
-    smb_path_planner \
-    smb_slam
-
-# RUN catkin build --no-status object_detection
-
-# # RUN catkin build --no-status smb_msf_graph
-
+# Save SMB_RAW_REPO_URL as an environment variable
+# It is used to fetch source code in post-create.sh script of devcontainer
 ARG SMB_RAW_REPO_URL
 ENV SMB_RAW_REPO_URL=${SMB_RAW_REPO_URL}
+
+# Install SMB dependencies
+# Most of the dependencies are installed in the base image
+# This is only for the dependencies that added after the base image is built
+ARG OVERLAY_WS
+RUN --mount=type=bind,from=cacher,source=/tmp/${OVERLAY_WS}/src,target=${OVERLAY_WS}/src \
+    rosdep update && rosdep install --from-paths ${OVERLAY_WS}/src --ignore-src --os=ubuntu:focal -r -y
+
 
