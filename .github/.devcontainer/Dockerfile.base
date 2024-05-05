@@ -1,12 +1,17 @@
 # syntax=docker/dockerfile:1
 
-ARG OVERLAY_WS=/opt/ros/overlay_ws
+###########################################################################
+########### This is the ROS base image for SuperMegaBot(SMB)             ##
+########### It is manually built and pushed to Github Container Registry ##
+###########################################################################
+
 ARG BASE_IMAGE=ros:noetic-perception-focal
+ARG OVERLAY_WS=/smb_ws
 ARG OPEN3D_INSTALL_DIR=/tmp/open3d_install
 
 FROM $BASE_IMAGE AS base
 
-# install common dependencies shared by all images
+# Install common dependencies shared by all images
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
     python3-vcstool \
     git \
@@ -15,23 +20,24 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-ins
     vim \
     nano 
 
-# cache dependency manifests for faster builds
+# Cache package.xml and python requirements.txt
+# if those are unchanged, buildx will use cache to speed up the build
 FROM base AS cacher
 
 ARG OVERLAY_WS
-ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/fix/remove_private_repos
+ARG SMB_REPO_BRANCH_NAME=docker
+ARG SMB_RAW_REPO_URL=https://raw.githubusercontent.com/ETHZ-RobotX/SuperMegaBot/${SMB_REPO_BRANCH_NAME}
 
 WORKDIR ${OVERLAY_WS}/src
 RUN vcs import --recursive --input ${SMB_RAW_REPO_URL}/smb.repos
 
-WORKDIR /opt
-RUN mkdir -p /tmp/opt && \
-    find ./ -name "package.xml" | \
-    xargs cp --parents -t /tmp/opt && \
-    find ./ -name "requirements.txt" | \
-    xargs cp --parents -t /tmp/opt || true && \
-    find ./ -name "CATKIN_IGNORE" | \
-    xargs cp --parents -t /tmp/opt || true
+WORKDIR /tmp
+RUN find ${OVERLAY_WS}/src -name "package.xml" | \
+    xargs cp --parents -t /tmp && \
+    find ${OVERLAY_WS}/src -name "requirements.txt" | \
+    xargs cp --parents -t /tmp || true && \
+    find ${OVERLAY_WS}/src -name "CATKIN_IGNORE" | \
+    xargs cp --parents -t /tmp || true
 
 FROM ubuntu:focal AS open3d-builder
 
@@ -74,20 +80,19 @@ ARG DEBIAN_FRONTEND=noninteractive
 LABEL org.opencontainers.image.source="https://github.com/ETHZ-RobotX/smb_docker"
 LABEL org.opencontainers.image.description="Prebuild base image of the SuperMegaBot(SMB) image."
 
-# install ros packages
+# Install ros packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-desktop-full=1.5.0-1*
 
-# install other dependencies
+# Install other dependencies
 RUN apt-get install -y --no-install-recommends \
     python3-catkin-tools \
     libfmt-dev 
 
 # Install SMB dependencies
 ARG OVERLAY_WS
-WORKDIR $OVERLAY_WS
-COPY --from=cacher /tmp/$OVERLAY_WS/src ./src
-RUN rosdep update && rosdep install --from-paths src --ignore-src --os=ubuntu:focal -r -y
+RUN --mount=type=bind,from=cacher,source=/tmp/${OVERLAY_WS}/src,target=${OVERLAY_WS}/src \
+    rosdep update && rosdep install --from-paths ${OVERLAY_WS}/src --ignore-src --os=ubuntu:focal -r -y
 
 # Install Open3D
 ARG OPEN3D_INSTALL_DIR
