@@ -65,7 +65,7 @@ jobs:
           no-cache-filters: cacher
           provenance: false
       - name: Update devcontainer.json
-        uses: restack/update-json-values-action@f3c458e872e467a6810b446755acf5771354aef1
+        uses: restackio/update-json-values-action@f3c458e872e467a6810b446755acf5771354aef1
         with:
           file: ./.devcontainer/devcontainer.json
           values: >-
