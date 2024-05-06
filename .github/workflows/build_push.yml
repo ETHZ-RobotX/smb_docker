@@ -2,20 +2,24 @@ name: build-smb-base-image
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [ "master" ]
   push:
-    branches: [ "master" ]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
+    branches:
+      - 'master'
+      - 'feature/**'
+      - 'fix/**'
+    paths:
+      - '.github/.devcontainer/**'
+      - '.github/workflows/build_push.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+      DOCKERFILE_PATH: ./.github/.devcontainer/Dockerfile
+      BUILD_CONTEXT: ./.github/.devcontainer
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -40,22 +44,37 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: latest=false
           tags: |
             type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}},priority=700
 
       - name: Build and push Docker image
+        id: docker-build
         uses: docker/build-push-action@v5
         env:
           BUILDX_NO_DEFAULT_ATTESTATIONS: 1
         with:
-          context: ./.github/.devcontainer
-          file: ./.github/.devcontainer/Dockerfile
+          context: ${{ env.BUILD_CONTEXT }}
+          file: ${{ env.DOCKERFILE_PATH }}
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/ethz-robotx/smb_docker:latest
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           no-cache-filters: cacher
           provenance: false
+      - name: Update devcontainer.json
+        uses: restack/update-json-values-action@f3c458e872e467a6810b446755acf5771354aef1
+        with:
+          file: ./.devcontainer/devcontainer.json
+          values: >-
+            {
+              "build.args.BASE_IMAGE": "${{ steps.docker-build.outputs.metadata['image.name'] }}",
+              "initializeCommand": "docker pull ${{ steps.docker-build.outputs.metadata['image.name'] }}"
+            }
+      - name: Commit and push changes
+        if: ${{ format('refs/heads/{0}', github.event.repository.default_branch) != github.ref }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update devcontainer.json base image to ${{ steps.docker-build.outputs.metadata['image.name'] }}
