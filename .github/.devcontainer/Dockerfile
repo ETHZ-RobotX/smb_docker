@@ -51,6 +51,9 @@ ENV SMB_RAW_REPO_URL=${SMB_RAW_REPO_URL}
 # This is only for the dependencies that added after the base image is built
 ARG OVERLAY_WS
 RUN --mount=type=bind,from=cacher,source=/tmp/${OVERLAY_WS}/src,target=${OVERLAY_WS}/src \
-    rosdep update && rosdep install --from-paths ${OVERLAY_WS}/src --ignore-src --os=ubuntu:focal -r -y
+    apt-get update && \
+    rosdep update && \
+    rosdep install --from-paths ${OVERLAY_WS}/src --ignore-src --os=ubuntu:focal -r -y && \
+    rm -rf /var/lib/apt/lists/*
 
 
