@@ -87,7 +87,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install other dependencies
 RUN apt-get install -y --no-install-recommends \
     python3-catkin-tools \
-    libfmt-dev 
+    libfmt-dev \
+    libgoogle-glog-dev \
+    libglfw3 \
+    libglfw3-dev \
+    ros-noetic-jsk-rviz-plugins \
+    liblua5.2-dev
 
 # Install SMB dependencies
 ARG OVERLAY_WS
