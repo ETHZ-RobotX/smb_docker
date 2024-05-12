@@ -64,17 +64,4 @@ jobs:
           cache-to: type=gha,mode=max
           no-cache-filters: cacher
           provenance: false
-      - name: Update devcontainer.json
-        uses: restackio/update-json-values-action@f3c458e872e467a6810b446755acf5771354aef1
-        with:
-          file: ./.devcontainer/devcontainer.json
-          values: >-
-            {
-              "build.args.BASE_IMAGE": "${{ steps.docker-build.outputs.metadata['image.name'] }}",
-              "initializeCommand": "docker pull ${{ steps.docker-build.outputs.metadata['image.name'] }}"
-            }
-      - name: Commit and push changes
-        if: ${{ format('refs/heads/{0}', github.event.repository.default_branch) != github.ref }}
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Update devcontainer.json base image to ${{ steps.docker-build.outputs.metadata['image.name'] }}
+          
