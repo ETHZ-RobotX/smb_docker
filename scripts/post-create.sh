@@ -54,6 +54,7 @@ if [ -d "${WORKSPACE_DIR}" ]; then
     if [ "$(stat -c %U ${WORKSPACE_DIR})" != "${USERNAME}" ]; then
         echo "Changing ownership of workspace directory to ${USERNAME}"
         sudo chown -R ${USERNAME}:${USERNAME} ${WORKSPACE_DIR}
+        echo "Ownership changed successfully."
     fi
 fi
 
@@ -73,6 +74,8 @@ echo "source <(fzf --zsh)" >> ~/.zshrc
 # Setup alias
 echo "alias wssetup=\"source ${ROOT}/devel/setup.bash\"" >> ~/.bashrc
 echo "alias wssetup=\"source ${ROOT}/devel/setup.zsh\"" >> ~/.zshrc
+echo "alias build-limit=\"catkin build --jobs 8 --mem-limit 70%\"" >> ~/.bashrc
+echo "alias build-limit=\"catkin build --jobs 8 --mem-limit 70%\"" >> ~/.zshrc
 
 # Make folder `src` if not exists
 if [ ! -d "${ROOT}/src" ]; then
@@ -80,6 +83,7 @@ if [ ! -d "${ROOT}/src" ]; then
 fi
 
 # Clone the repository
+echo "Cloning the repository..."
 vcs import --input "${SMB_RAW_REPO_FILE_URL}" --recursive --skip-existing "${ROOT}/src"
 
 # Setup catkin workspace
