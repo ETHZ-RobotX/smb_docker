@@ -18,14 +18,14 @@ entrypoint() {
 
         echo "VNC server started."
     else
-    # Use x11 forwarding
+        # Use x11 forwarding
         echo "Info: USE_X11_FORWARDING is set. GUI applications will be displayed on the host."
     fi
 
     if [ -z "$USE_X11_FORWARDING" ]; then 
-        echo "Keep this terminal running and run \`docker exec -it smb_container_x11 zsh\` in another terminal to enter the container."
+        echo "Keep this terminal running and run \`docker exec -it smb_container zsh\` in another terminal to enter the container."
     else
-        echo "Keep this terminal running and run \`docker exec -it smb_container bash\` in another terminal to enter the container."
+        echo "Keep this terminal running and run \`docker exec -it smb_container_x11 zsh\` in another terminal to enter the container."
     fi
 
     sleep infinity
