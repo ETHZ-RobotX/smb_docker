@@ -63,7 +63,6 @@ jobs:
           BUILDX_NO_DEFAULT_ATTESTATIONS: true
         with:
           imageName: ghcr.io/ethz-robotx/smb_docker
-          cacheFrom: ghcr.io/ethz-robotx/smb_docker
           platform: linux/amd64,linux/arm64
           subFolder: .github
           push: always
