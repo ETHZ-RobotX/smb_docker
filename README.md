@@ -82,7 +82,7 @@ You can run the following command to start the simulation:
 cd /workspaces/rss_workspace
 catkin build smb_gazebo
 source devel/setup.zsh
-roslaunch smb_gazebo smb.launch
+roslaunch smb_gazebo sim.launch
 ```
 
 If everything goes well, you should see the Gazebo simulation running and the GUI in the respective VNC viewer or X11 forwarding.
