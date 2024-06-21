@@ -4,6 +4,12 @@ run-name: build@${{ github.ref_name }}
 
 on:
   workflow_dispatch:
+  
+  push:
+    branches:
+      - master
+    paths:
+      - .github/.devcontainer/**
 
 defaults:
   run:
