@@ -41,7 +41,7 @@ Once you are finished, you can stop the container by pressing `Ctrl+C` in the te
 docker compose -f compose-x11.yaml down
 ```
 
-### Running teh container with VNC enabled
+### Running the container with VNC enabled
 > [!NOTE]  
 > This method works on all platforms.
 
