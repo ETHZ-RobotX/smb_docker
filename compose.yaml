@@ -1,4 +1,4 @@
-name: smb_docker_project
+name: smb_docker_vnc
 
 services:
   smb_container:
@@ -10,17 +10,16 @@ services:
     network_mode: host
     user: robotx
     command: "bash /post_create_config"
-    working_dir: ${WORKSPACE_DIR:?error}
+    working_dir: /workspaces/rss_workspace
     configs:
       - post_create_config
     env_file: .env
     environment:
       - QT_X11_NO_MITSHM=1
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=:1
+      - WORKSPACE_DIR=/workspaces/rss_workspace
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ./scripts:/scripts:rw
-      - smb_volume:${WORKSPACE_DIR:?error}:rw
+      - smb_volume:/workspaces/rss_workspace:rw
 
 volumes:
   smb_volume:
