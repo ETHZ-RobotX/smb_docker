@@ -17,8 +17,9 @@
 			"configureZshAsDefaultShell": true
 		},
 		"ghcr.io/devcontainers/features/git:1": {},
-		// "ghcr.io/devcontainers/features/desktop-lite:1": {
-		// 	"password": "robotx"
-		// }
-	}
+		"ghcr.io/devcontainers/features/desktop-lite:1": {
+			"password": "robotx"
+		}
+	},
+	"containerUser": "robotx"
 }
