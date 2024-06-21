@@ -11,6 +11,8 @@
 
 There are two ways to run the Docker container. Choosing which one to use depends on how you want to use the GUI application.
 
+If you have a Linux machine and want to display the GUI application on your screen directly, you can use X11 forwarding. If you are using Windows or Mac, you should use VNC to access the GUI application.
+
 ### Running the container with X11 forwarding enabled
 
 > [!IMPORTANT]  
@@ -70,7 +72,13 @@ Once you are finished, you can stop the container by pressing `Ctrl+C` in the te
 docker compose down
 ```
 
-### Try a GUI application
+## Open multiple terminals inside the container
+
+When working with ROS, you may need to open multiple terminals to run different commands. You can copy and paste the `docker exec ...` command to multiple terminals and run to open multiple terminals inside the container. As long as the `docker compose up` command is running, you can attach to the same container multiple times. It won't create a new container.
+
+Alternatively, you can use `tmux` to manage multiple terminals in one terminal. For details on how to use `tmux`, please refer to the [official documentation](https://github.com/tmux/tmux/wiki).
+
+## Try a GUI application
 
 The default catkin workspace is `/workspaces/rss_workspace`. 
 
@@ -85,4 +93,4 @@ source devel/setup.zsh
 roslaunch smb_gazebo sim.launch
 ```
 
-If everything goes well, you should see the Gazebo simulation running and the GUI in the respective VNC viewer or X11 forwarding.
+If everything goes well, you should see the Gazebo simulation running and the GUI on your screen or VNC viewer.
