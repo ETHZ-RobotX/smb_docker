@@ -7,10 +7,13 @@ services:
     privileged: true
     pull_policy: always
     restart: "no"
-    network_mode: host
+    # network_mode: host
     user: robotx
     command: ["bash", "/post_create_config"]
     working_dir: /workspaces/rss_workspace
+    ports:
+      - 5901:5901
+      - 6080:6080
     configs:
       - post_create_config
     env_file: .env
@@ -18,6 +21,7 @@ services:
       - QT_X11_NO_MITSHM=1
       - DISPLAY=:1
       - WORKSPACE_DIR=/workspaces/rss_workspace
+      - VNC_PASSWORD=robotx
     volumes:
       - smb_volume:/workspaces/rss_workspace:rw
 

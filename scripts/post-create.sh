@@ -14,6 +14,8 @@ entrypoint() {
         echo "Starting VNC server..."
         # change the resolution of the VNC server
         sudo sed -i "s@\(export VNC_RESOLUTION=\)\".*\"@\1\"$VNC_RESOLUTION\"@" /usr/local/share/desktop-init.sh
+        # change append no to -localhost flag
+        sudo sed -i "s@-localhost@-localhost no@" /usr/local/share/desktop-init.sh
         # start the VNC server
         bash /usr/local/share/desktop-init.sh
 
