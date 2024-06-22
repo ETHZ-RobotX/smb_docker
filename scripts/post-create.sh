@@ -4,7 +4,8 @@ set -e
 entrypoint() {
     # Start the VNC server if X11 forwarding is not enabled
     echo -e "\n\n"
-    if [ -z "$USE_X11_FORWARDING" ]; then 
+    if [ -z "$USE_X11_FORWARDING" ] || [ "$USE_X11_FORWARDING" -eq 0 ]; then 
+        # Use VNC by default
         echo "Info: USE_X11_FORWARDING is not set. Use VNC to access GUI applications."
         echo "Info: Open \`localhost:5901\` in your VNC client to access the desktop."
         echo "Info: or open \`localhost:6080\` in your web browser to access the desktop."
@@ -17,26 +18,30 @@ entrypoint() {
         bash /usr/local/share/desktop-init.sh
 
         echo "VNC server started."
+        echo "Keep this terminal running and run \`docker exec -it smb_container zsh\` in another terminal to enter the container."
     else
         # Use x11 forwarding
         echo "Info: USE_X11_FORWARDING is set. GUI applications will be displayed on the host."
-    fi
-
-    if [ -z "$USE_X11_FORWARDING" ]; then 
-        echo "Keep this terminal running and run \`docker exec -it smb_container zsh\` in another terminal to enter the container."
-    else
         echo "Keep this terminal running and run \`docker exec -it smb_container_x11 zsh\` in another terminal to enter the container."
     fi
 
-    sleep infinity
+    # create a named pipe if it does not exist
+    if [ ! -p /tmp/keep-container-running ]; then
+        mkfifo /tmp/keep-container-running
+    fi
+    # read from named pipe to keep the container running
+    read < /tmp/keep-container-running
 }
+
+# trap SIGTERM and exit the script; docker stop sends SIGTERM
+trap "exit 0" SIGTERM
 
 USERNAME=$(whoami)
 
 echo "Post-create command started"
 echo "WORKSPACE_DIR: ${WORKSPACE_DIR}"
 echo "SMB_RAW_REPO_FILE_URL: ${SMB_RAW_REPO_FILE_URL}"
-echo "USE_X11_FORWARDING: ${USE_X11_FORWARDING}"
+echo "USE_X11_FORWARDING: ${USE_X11_FORWARDING:-OFF}"
 echo "DISPLAY: ${DISPLAY}"
 echo "VNC_RESOLUTION: ${VNC_RESOLUTION}"
 echo "USER: ${USERNAME}"

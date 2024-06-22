@@ -9,7 +9,7 @@ services:
     restart: "no"
     network_mode: host
     user: robotx
-    command: "bash /post_create_config"
+    command: ["bash", "/post_create_config"]
     working_dir: /workspaces/rss_workspace
     configs:
       - post_create_config
