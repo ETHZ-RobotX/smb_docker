@@ -1,0 +1,25 @@
+// This file is only used to pre-build the dev container image in the GitHub Actions workflow.
+// We only include the required features for the dev container here.
+{
+	"name": "SuperMegaBot Docker",
+	"build": {
+		"context": ".",
+		"dockerfile": "Dockerfile",
+		"args": {
+			"BUILDKIT_INLINE_CACHE": "0",
+			"BASE_IMAGE": "ghcr.io/ethz-robotx/rss_workspace:main",
+			"VNC_RESOLUTION": "1920x1080x32"
+		}
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"username": "robotx",
+			"configureZshAsDefaultShell": true
+		},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/desktop-lite:1": {
+			"password": "robotx"
+		}
+	},
+	"containerUser": "robotx"
+}

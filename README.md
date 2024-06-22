@@ -1,88 +1,96 @@
-# Using Docker for Simulation
-> To use the SMB Docker, basic knowledge of Docker is needed. Please check [the official website](https://docs.docker.com) to learn how to build, save, reconnect etc.
+# Using Docker for the SuperMegaBot Software
 
+## Installation
+1. Install Docker by following [the official website](https://docs.docker.com/get-docker/)
 
-## Setting up Docker
+2. (Required if you want to run GUI application with VNC) Install Real VNC Viewer by following [the official website](https://www.realvnc.com/en/connect/download/viewer)
 
-### Linux
-1. Install Docker by following [the official website](https://docs.docker.com/engine/install/)
-2. Clone the [repo](https://github.com/ETHZ-RobotX/smb_docker/) into a directory on your host computer
-3. Run the bash file to create the container
+3. Clone this repository to your local machine
+
+## Running the Docker container
+
+There are two ways to run the Docker container. Choosing which one to use depends on how you want to use the GUI application.
+
+If you have a Linux machine and want to display the GUI application on your screen directly, you can use X11 forwarding. If you are using Windows or Mac, you should use VNC to access the GUI application.
+
+### Running the container with X11 forwarding enabled
+
+> [!IMPORTANT]  
+> It only works on Linux. If you are using Windows or Mac, please refer to the next section.
+
+Run the following command to start the Docker container with X11 forwarding:
 
 ```bash
-# Go the directory where you downloaded the repo to
-cd <path/to/repo>
-
-# Activate Container
-./create_container.bash
+docker compose -f compose-x11.yaml up
 ```
 
-This will automatically setup your system to later run the docker and download the pre-compiled image from dockerhub. Once downloaded, the script starts a container called `smb_container` that can be used to run the SMB software (see [reconnecting to the docker container](#reconnecting-to-the-docker-container)).
-
-
-### Windows
-1. Install Docker Desktop by using [the official website](https://docs.docker.com/desktop/windows/install/)
-2. Install VcXsrv [here](https://sourceforge.net/projects/vcxsrv/)
-3. Launch VcXsrv and put the settings as in the pictures
-   ![setup 1](images/docker_setup_1.png)
-
-   ![setup 2](images/docker_setup_2.png)
-
-   ![setup 3](images/docker_setup_3.png)
-
-4. Open the powershell and run
+If everything goes well, you should see instructions in the terminal on how to attach to the container. You should keep the `docker compose` running and open a new terminal to attach to the container with the following command:
 
 ```bash
-# Run docker
-docker run -it --env="DISPLAY=host.docker.internal:0.0" --volume=smb_volume:/home/catkin_ws/src --net=host --name smb_container ethzrobotx/smb_docker bash
+docker exec -it smb_container_x11 zsh 
 ```
 
-5. To exit the container type `exit` in the terminal
+> [!NOTE]
+> If you are using a different shell, you can replace `zsh` with `bash`, `tmux`, etc.
 
-## Setup Visual Studio Code for use with Docker container
+If you open a GUI application in the container, it should be displayed on your screen.
 
-> Visual Studio Code is a powerful integrated development environment that even allows accessing code inside a Docker container.
-> Usage of Visual Studio is not necessary.
+Once you are finished, you can stop the container by pressing `Ctrl+C` in the terminal where you ran `docker compose up`.
 
-
-1. Open Visual Studio Code and install the **dev - containers** extension.
-2. Click on the extension on the bottom left corner and attach to the previously created container.
-3. When the new window opens install the **C/C++** and **Python** extension from Microsoft inside the container. This is needed in order to get autocompletion.
-4. The catkin workspace is located in /home/catkin_ws
-
-## (Re-)connecting to the Docker container
-
-Once you have setup the smb_container, you can create a terminal (bash shell) by running
+(Optional) You can remove the container by running the following command:
 
 ```bash
-docker exec -it smb_container bash
+docker compose -f compose-x11.yaml down
 ```
 
-There is no need to run the script create_container.sh anymore. 
+### Running the container with VNC enabled
+> [!NOTE]  
+> This method works on all platforms.
 
-If you closed all running instances of bash in the `smb_container`, you might need to start it again by running
+Run the following command to start the Docker container with VNC:
 
 ```bash
-# start docker container
-docker start smb_container
-
-# create a terminal (bash) in the container:
-docker exec -it smb_container bash
+docker compose up
 ```
 
-The latter command can be repeated multiple times to create several terminals in the same container.
-
-## How to use the simulation in the Docker container
-
-If you want to run the simulation you can follow the [how to run SMB software](https://ethz-robotx.github.io/SuperMegaBot/core-software/HowToRunSoftware.html) and run the commands given there in a terminal in the smb_container. I.e.
+You can attach to the container with the following command:
 
 ```bash
-# create a terminal (bash) in the container:
-docker exec -it smb_container bash
+docker exec -it smb_container zsh
 ```
 
-In the then so created terminal, run:
+> [!NOTE]
+> If you are using a different shell, you can replace `zsh` with `bash`, `tmux`, etc.
+
+If you open a GUI application in the container, you can access it by connecting to `localhost:5901` with a VNC client. The password is `robotx`.
+
+Once you are finished, you can stop the container by pressing `Ctrl+C` in the terminal where you ran `docker compose up`.
+
+(Optional) You can remove the container by running the following command:
 
 ```bash
+docker compose down
+```
+
+## Open multiple terminals inside the container
+
+When working with ROS, you may need to open multiple terminals to run different commands. You can copy and paste the `docker exec ...` command to multiple terminals and run to open multiple terminals inside the container. As long as the `docker compose up` command is running, you can attach to the same container multiple times. It won't create a new container.
+
+Alternatively, you can use `tmux` to manage multiple terminals in one terminal. For details on how to use `tmux`, please refer to the [official documentation](https://github.com/tmux/tmux/wiki).
+
+## Try a GUI application
+
+The default catkin workspace is `/workspaces/rss_workspace`. 
+
+You can try to run the smb gazebo simulation inside the container to see if the GUI application works. 
+
+You can run the following command to start the simulation:
+
+```bash
+cd /workspaces/rss_workspace
+catkin build smb_gazebo
+source devel/setup.zsh
 roslaunch smb_gazebo sim.launch
 ```
+
+If everything goes well, you should see the Gazebo simulation running and the GUI on your screen or VNC viewer.

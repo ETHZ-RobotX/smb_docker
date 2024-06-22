@@ -1,0 +1,21 @@
+name: smb_docker_x11_forwarding
+
+services:
+  smb_container_x11:
+    extends:
+      file: compose.yaml
+      service: smb_container
+    container_name: smb_container_x11
+    environment:
+      - DISPLAY=${DISPLAY}
+      - USE_X11_FORWARDING=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+volumes:
+  smb_volume:
+    name: smb_volume_x11
+
+configs:
+  post_create_config:
+    file: ./scripts/post-create.sh
