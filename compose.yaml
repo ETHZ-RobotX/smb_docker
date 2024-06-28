@@ -5,7 +5,7 @@ services:
     image: ghcr.io/ethz-robotx/smb_docker:latest
     container_name: smb_container
     privileged: true
-    pull_policy: always
+    # pull_policy: always
     restart: "no"
     network_mode: host
     user: robotx
