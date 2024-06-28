@@ -72,32 +72,41 @@ echo "export HISTFILE=${ROOT}/.zsh_history" >> ~/.zshrc
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 echo "source /opt/ros/noetic/setup.zsh" >> ~/.zshrc
 
-# Setup fzf
+# Setup fzf completions
 echo "eval \"\$(fzf --bash)\"" >> ~/.bashrc
 echo "source <(fzf --zsh)" >> ~/.zshrc
+
+# Setup vcs completions
+echo "source /usr/share/vcstool-completion/vcs.bash" >> ~/.bashrc
+echo "source /usr/share/vcstool-completion/vcs.zsh" >> ~/.zshrc
 
 # Setup alias
 echo "alias wssetup=\"source ${ROOT}/devel/setup.bash\"" >> ~/.bashrc
 echo "alias wssetup=\"source ${ROOT}/devel/setup.zsh\"" >> ~/.zshrc
 echo "alias build-limit=\"catkin build --jobs 8 --mem-limit 70%\"" >> ~/.bashrc
 echo "alias build-limit=\"catkin build --jobs 8 --mem-limit 70%\"" >> ~/.zshrc
+echo "alias connect-smb=\"export ROS_MASTER_URI=http://\$(ip route show default | grep -oP 'via \K\d+\.\d+\.\d+').5:11311 ; export ROS_IP=\$(ip route get 8.8.8.8 | grep -oP '(?<=src )\S+') ; echo 'ROS_MASTER_URI and ROS_IP set to ' ; printenv ROS_MASTER_URI ; printenv ROS_IP\"" >> ~/.bashrc
+echo "alias connect-smb=\"export ROS_MASTER_URI=http://\$(ip route show default | grep -oP 'via \K\d+\.\d+\.\d+').5:11311 ; export ROS_IP=\$(ip route get 8.8.8.8 | grep -oP '(?<=src )\S+') ; echo 'ROS_MASTER_URI and ROS_IP set to ' ; printenv ROS_MASTER_URI ; printenv ROS_IP\"" >> ~/.zshrc
 
 # Make folder `src` if not exists
 if [ ! -d "${ROOT}/src" ]; then
     mkdir -p "${ROOT}/src"
+
+    # Clone the repository
+    echo "Cloning the repository... This may take a while."
+    vcs import --input "${SMB_RAW_REPO_FILE_URL}" --recursive --skip-existing "${ROOT}/src"
+
+    # Setup catkin workspace
+    catkin init --workspace "${ROOT}" &> /dev/null
+
+    # Configure the workspace
+    catkin config --workspace "${ROOT}" \
+                  --extend /opt/ros/noetic \
+                  --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+else
+    echo "Workspace already exists. Skipping cloning the repository."
+    echo "If you want to clone the repository again, delete the `src` folder and run `docker compose [-f compose-x11.yaml] down` and `docker compose [-f compose-x11.yaml] up`."
 fi
-
-# Clone the repository
-echo "Cloning the repository..."
-vcs import --input "${SMB_RAW_REPO_FILE_URL}" --recursive --skip-existing "${ROOT}/src"
-
-# Setup catkin workspace
-catkin init --workspace "${ROOT}" &> /dev/null
-
-# Configure the workspace
-catkin config --workspace "${ROOT}" \
-              --extend /opt/ros/noetic \
-              --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # save checkpoint
 sudo touch "/.initialized"
