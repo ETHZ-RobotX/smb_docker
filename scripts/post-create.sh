@@ -81,12 +81,30 @@ echo "source /usr/share/vcstool-completion/vcs.bash" >> ~/.bashrc
 echo "source /usr/share/vcstool-completion/vcs.zsh" >> ~/.zshrc
 
 # Setup alias
-echo "alias wssetup=\"source ${ROOT}/devel/setup.bash\"" >> ~/.bashrc
-echo "alias wssetup=\"source ${ROOT}/devel/setup.zsh\"" >> ~/.zshrc
-echo "alias build-limit=\"catkin build --jobs 8 --mem-limit 70%\"" >> ~/.bashrc
-echo "alias build-limit=\"catkin build --jobs 8 --mem-limit 70%\"" >> ~/.zshrc
-echo "alias connect-smb=\"export ROS_MASTER_URI=http://\$(ip route show default | grep -oP 'via \K\d+\.\d+\.\d+').5:11311 ; export ROS_IP=\$(ip route get 8.8.8.8 | grep -oP '(?<=src )\S+') ; echo 'ROS_MASTER_URI and ROS_IP set to ' ; printenv ROS_MASTER_URI ; printenv ROS_IP\"" >> ~/.bashrc
-echo "alias connect-smb=\"export ROS_MASTER_URI=http://\$(ip route show default | grep -oP 'via \K\d+\.\d+\.\d+').5:11311 ; export ROS_IP=\$(ip route get 8.8.8.8 | grep -oP '(?<=src )\S+') ; echo 'ROS_MASTER_URI and ROS_IP set to ' ; printenv ROS_MASTER_URI ; printenv ROS_IP\"" >> ~/.zshrc
+echo "alias wssetup='source ${ROOT}/devel/setup.bash'" >> ~/.bashrc
+echo "alias wssetup='source ${ROOT}/devel/setup.zsh'" >> ~/.zshrc
+echo "alias build-limit='catkin build --jobs 8 --mem-limit 70%'" >> ~/.bashrc
+echo "alias build-limit='catkin build --jobs 8 --mem-limit 70%'" >> ~/.zshrc
+
+cat <<'EOF' >> ~/.bashrc
+connect-smb() {
+    export ROS_MASTER_URI=http://$(ip route show default | grep -oP 'via \K\d+\.\d+\.\d+').5:11311
+    export ROS_IP=$(ip route get 8.8.8.8 | grep -oP '(?<=src )\S+')
+    echo 'ROS_MASTER_URI and ROS_IP set to '
+    printenv ROS_MASTER_URI
+    printenv ROS_IP
+}
+EOF
+
+cat <<'EOF' >> ~/.zshrc
+connect-smb() {
+    export ROS_MASTER_URI=http://$(ip route show default | grep -oP 'via \K\d+\.\d+\.\d+').5:11311
+    export ROS_IP=$(ip route get 8.8.8.8 | grep -oP '(?<=src )\S+')
+    echo 'ROS_MASTER_URI and ROS_IP set to '
+    printenv ROS_MASTER_URI
+    printenv ROS_IP
+}
+EOF
 
 # Make folder `src` if not exists
 if [ ! -d "${ROOT}/src" ]; then
