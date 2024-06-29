@@ -13,4 +13,7 @@ Changelog
 * Comment `pull_policy` in `compose.yaml` to avoid pulling images on every run
 * Do not `vcs pull` if `src` exists
 
+1.1.1 (2024-06-29)
+--------------
+* Fix `connect-smb` shell alias.
 
